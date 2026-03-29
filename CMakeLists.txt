@@ -19,3 +19,12 @@ target_link_libraries(program_main PRIVATE
     glfw
     glad::glad
 )
+
+enable_testing()
+
+add_executable(test_character test/test_character.cpp src/Character.cpp src/Model.cpp src/Shader.cpp)
+target_link_libraries(test_character PRIVATE
+    glfw
+    glad::glad
+)
+add_test(NAME CharacterTest COMMAND test_character)
