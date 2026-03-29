@@ -10,6 +10,9 @@ find_package(glad CONFIG REQUIRED)
 
 add_executable(program_main 
     src/main.cpp
+    src/Shader.cpp
+    src/Model.cpp
+    src/Character.cpp
 )
 
 target_link_libraries(program_main PRIVATE
