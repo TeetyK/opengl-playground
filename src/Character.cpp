@@ -1,12 +1,12 @@
 #include "Character.h"
 
-Character::Character(float startX, float startY, float startZ, float w, float h, Model* charModel)
+Character::Character(float startX, float startY, float startZ, float w, float h, Mesh* charModel)
     : x(startX), y(startY), z(startZ), width(w), height(h), model(charModel), velocityZ(0.0f), isJumping(false) {
 }
 
 void Character::update(float deltaTime) {
     if (isJumping) {
-        float gravity = -9.8f;
+        float gravity = -980.0f; // Scaled up for screen pixel coordinates
         velocityZ += gravity * deltaTime;
         z += velocityZ * deltaTime;
 
