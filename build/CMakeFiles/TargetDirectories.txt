@@ -1,3 +1,0 @@
-F:/opengl-playground/build/CMakeFiles/program_main.dir
-F:/opengl-playground/build/CMakeFiles/ALL_BUILD.dir
-F:/opengl-playground/build/CMakeFiles/ZERO_CHECK.dir
