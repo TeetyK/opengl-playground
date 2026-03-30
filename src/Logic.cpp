@@ -13,7 +13,7 @@ Logic::Logic()
 
 Logic::~Logic() {}
 
-void Logic::update(float deltaTime, Windows& window, Character& character) {
+void Logic::update(float deltaTime, Windows& window, Character& character, const std::vector<std::vector<int>>& gameMap, float tileSize) {
     bool isEscPressed = window.isKeyPressed(GLFW_KEY_ESCAPE);
     if (isEscPressed && !wasEscPressed) {
         if (showCommandPrompt) {
@@ -27,11 +27,11 @@ void Logic::update(float deltaTime, Windows& window, Character& character) {
     wasEscPressed = isEscPressed;
 
     if (currentState == GameState::Playing) {
-        updatePlayingState(deltaTime, window, character);
+        updatePlayingState(deltaTime, window, character, gameMap, tileSize);
     }
 }
 
-void Logic::updatePlayingState(float deltaTime, Windows& window, Character& character) {
+void Logic::updatePlayingState(float deltaTime, Windows& window, Character& character, const std::vector<std::vector<int>>& gameMap, float tileSize) {
     if (!showCommandPrompt) {
         float moveSpeed = speed * deltaTime;
 
@@ -42,10 +42,29 @@ void Logic::updatePlayingState(float deltaTime, Windows& window, Character& char
         // Could use mx, my, clicked for something, currently just acknowledging it's available.
 
         bool moving = false;
-        if (window.isKeyPressed(GLFW_KEY_W)) { character.y += moveSpeed; character.direction = 1; moving = true; }
-        if (window.isKeyPressed(GLFW_KEY_S)) { character.y -= moveSpeed; character.direction = 0; moving = true; }
-        if (window.isKeyPressed(GLFW_KEY_A)) { character.x -= moveSpeed; character.direction = 2; character.flipX = true; moving = true; }
-        if (window.isKeyPressed(GLFW_KEY_D)) { character.x += moveSpeed; character.direction = 2; character.flipX = false; moving = true; }
+        float nextX = character.x;
+        float nextY = character.y;
+
+        if (window.isKeyPressed(GLFW_KEY_W)) { nextY += moveSpeed; character.direction = 1; moving = true; }
+        if (window.isKeyPressed(GLFW_KEY_S)) { nextY -= moveSpeed; character.direction = 0; moving = true; }
+        if (window.isKeyPressed(GLFW_KEY_A)) { nextX -= moveSpeed; character.direction = 2; character.flipX = true; moving = true; }
+        if (window.isKeyPressed(GLFW_KEY_D)) { nextX += moveSpeed; character.direction = 2; character.flipX = false; moving = true; }
+
+        if (moving) {
+            // Collision detection
+            // Calculate grid indices based on next position.
+            // We use center of character or bottom, let's just use nextX, nextY directly.
+            int gridX = static_cast<int>(nextX / tileSize);
+            int gridY = static_cast<int>(nextY / tileSize);
+
+            // Clamp indices
+            if (gridY >= 0 && gridY < gameMap.size() && gridX >= 0 && gridX < gameMap[0].size()) {
+                if (gameMap[gridY][gridX] == 0) { // 0 is walkable
+                    character.x = nextX;
+                    character.y = nextY;
+                }
+            }
+        }
 
         character.isMoving = moving;
 
