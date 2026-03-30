@@ -10,6 +10,7 @@ find_package(glad CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
 find_path(STB_INCLUDE_DIRS "stb_image.h")
+# find_path(STB_INCLUDE_DIR stb_image.h)
 
 add_executable(program_main 
     src/main.cpp
