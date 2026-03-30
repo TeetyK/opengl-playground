@@ -1,0 +1,43 @@
+# Exported by Open CASCADE Technology [dev.opencascade.org]
+newmtl outline
+Ka 0.200000 0.200000 0.200000
+Kd 0.800000 0.800000 0.800000
+Ks 0.484529 0.484529 0.484529
+Ns 1000.000000
+map_Kd Koharu_textures/outline.png
+newmtl eye brow
+Ka 0.200000 0.200000 0.200000
+Kd 0.800000 0.800000 0.800000
+Ks 0.484529 0.484529 0.484529
+Ns 1000.000000
+map_Kd Koharu_textures/koharu_original_face.png
+newmtl eye
+Ka 0.200000 0.200000 0.200000
+Kd 0.800000 0.800000 0.800000
+Ks 0.484529 0.484529 0.484529
+Ns 1000.000000
+map_Kd Koharu_textures/koharu_original_eyes.png
+newmtl mouth
+Ka 0.200000 0.200000 0.200000
+Kd 0.800000 0.800000 0.800000
+Ks 0.484529 0.484529 0.484529
+Ns 1000.000000
+map_Kd Koharu_textures/mouth.png
+newmtl body
+Ka 0.200000 0.200000 0.200000
+Kd 0.800000 0.800000 0.800000
+Ks 0.484529 0.484529 0.484529
+Ns 1000.000000
+map_Kd Koharu_textures/koharu_original_body.png
+newmtl hair
+Ka 0.200000 0.200000 0.200000
+Kd 0.800000 0.800000 0.800000
+Ks 0.484529 0.484529 0.484529
+Ns 1000.000000
+map_Kd Koharu_textures/koharu_original_hair.png
+newmtl halo glow
+Ka 0.200000 0.200000 0.200000
+Kd 0.800000 0.800000 0.800000
+Ks 0.484529 0.484529 0.484529
+Ns 1000.000000
+map_Kd Koharu_textures/koharu_original_halo.png
