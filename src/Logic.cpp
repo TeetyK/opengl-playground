@@ -5,8 +5,10 @@
 
 Logic::Logic()
     : currentState(GameState::Menu), speed(100.0f), showCommandPrompt(false),
-      justOpenedPrompt(false), wasSlashPressed(false), wasEscPressed(false) {
+      justOpenedPrompt(false), wasSlashPressed(false), wasEscPressed(false), playerName("Player") {
     commandBuf[0] = '\0';
+    strncpy(nameBuf, playerName.c_str(), sizeof(nameBuf) - 1);
+    nameBuf[sizeof(nameBuf) - 1] = '\0';
 }
 
 Logic::~Logic() {}
@@ -39,10 +41,13 @@ void Logic::updatePlayingState(float deltaTime, Windows& window, Character& char
         bool clicked = window.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT);
         // Could use mx, my, clicked for something, currently just acknowledging it's available.
 
-        if (window.isKeyPressed(GLFW_KEY_W)) character.y += moveSpeed;
-        if (window.isKeyPressed(GLFW_KEY_S)) character.y -= moveSpeed;
-        if (window.isKeyPressed(GLFW_KEY_A)) character.x -= moveSpeed;
-        if (window.isKeyPressed(GLFW_KEY_D)) character.x += moveSpeed;
+        bool moving = false;
+        if (window.isKeyPressed(GLFW_KEY_W)) { character.y += moveSpeed; character.direction = 1; moving = true; }
+        if (window.isKeyPressed(GLFW_KEY_S)) { character.y -= moveSpeed; character.direction = 0; moving = true; }
+        if (window.isKeyPressed(GLFW_KEY_A)) { character.x -= moveSpeed; character.direction = 2; character.flipX = true; moving = true; }
+        if (window.isKeyPressed(GLFW_KEY_D)) { character.x += moveSpeed; character.direction = 2; character.flipX = false; moving = true; }
+
+        character.isMoving = moving;
 
         if (window.isKeyPressed(GLFW_KEY_SPACE) && !character.isJumping) {
             character.isJumping = true;
@@ -101,7 +106,14 @@ void Logic::renderOptionsMenu(Windows& window) {
     ImGui::Begin("Options", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav);
 
     ImGui::Text("Options Menu");
+
+    ImGui::InputText("Player Name", nameBuf, sizeof(nameBuf));
+    if (ImGui::IsItemDeactivatedAfterEdit()) {
+        playerName = std::string(nameBuf);
+    }
+
     if (ImGui::Button("Back", ImVec2(200, 50))) {
+        playerName = std::string(nameBuf); // Save on exit
         currentState = GameState::Menu;
     }
 

@@ -20,6 +20,8 @@ public:
 
     GameState getGameState() const { return currentState; }
 
+    std::string getPlayerName() const { return playerName; }
+
 private:
     GameState currentState;
     float speed;
@@ -28,6 +30,9 @@ private:
     bool justOpenedPrompt;
     bool wasSlashPressed;
     bool wasEscPressed;
+
+    char nameBuf[64];
+    std::string playerName;
 
     void updatePlayingState(float deltaTime, Windows& window, Character& character);
     void renderMainMenu(Windows& window);
