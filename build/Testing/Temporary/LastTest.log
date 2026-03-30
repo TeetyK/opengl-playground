@@ -1,0 +1,19 @@
+Start testing: Mar 30 01:10 UTC
+----------------------------------------------------------
+1/1 Testing: CharacterTest
+1/1 Test: CharacterTest
+Command: "/app/build/test_character"
+Directory: /app/build
+"CharacterTest" start time: Mar 30 01:10 UTC
+Output:
+----------------------------------------------------------
+Character tests passed!
+<end of output>
+Test time =   0.00 sec
+----------------------------------------------------------
+Test Passed.
+"CharacterTest" end time: Mar 30 01:10 UTC
+"CharacterTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Mar 30 01:10 UTC
