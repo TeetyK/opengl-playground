@@ -32,7 +32,7 @@ target_include_directories(program_main PRIVATE ${STB_INCLUDE_DIRS})
 
 enable_testing()
 
-add_executable(test_character test/test_character.cpp src/Character.cpp src/Mesh.cpp src/Shader.cpp)
+add_executable(test_character test/test_character.cpp src/Character.cpp src/Mesh.cpp src/Shader.cpp src/Image.cpp)
 target_link_libraries(test_character PRIVATE
     glfw
     glad::glad
