@@ -12,6 +12,12 @@
 #include "Character.h"
 #include "Logic.h"
 #include "Image.h"
+#include <vector>
+
+// Map constants
+const int MAP_WIDTH = 25;
+const int MAP_HEIGHT = 12;
+const float TILE_SIZE = 50.0f; // 1280/25 = 51.2, 600/12 = 50. Let's use 50.0f for simplicity.
 
 // Vertex shader source
 const char* vertexShaderSource = R"glsl(
@@ -92,8 +98,27 @@ int main() {
     Image backgroundTex("assets/Tiles/Background_Green_TileSet.png");
     Image bushTex("assets/Objects/Nature/Green/Bush_1_Green.png");
 
+    // Load new obstacle textures
+    Image treeTex("assets/Objects/Nature/Green/Tree_1_Spruce_Green.png");
+
     // Setup character at center (640, 300) with scale 50x50 pixels
     Character myCharacter(640.0f, 300.0f, 0.0f, 50.0f, 50.0f, &myMesh);
+
+    // Map definition: 0 = empty, 1 = bush, 2 = tree
+    std::vector<std::vector<int>> gameMap = {
+        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2},
+        {2, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+        {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+        {2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 2},
+        {2, 0, 1, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+        {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+        {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+        {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+        {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 2},
+        {2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+        {2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2},
+        {2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2}
+    };
     myCharacter.idleTexture = &charIdle;
     myCharacter.runTexture = &charRun;
 
@@ -121,7 +146,7 @@ int main() {
 
         gameWindow.pollEvents();
 
-        gameLogic.update(deltaTime, gameWindow, myCharacter);
+        gameLogic.update(deltaTime, gameWindow, myCharacter, gameMap, TILE_SIZE);
 
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -157,14 +182,21 @@ int main() {
 
             struct RenderEntity {
                 float x, y, z;
-                int type; // 0 = character, 1 = bush
+                int type; // 0 = character, 1 = bush, 2 = tree
             };
 
-            std::vector<RenderEntity> entities = {
-                {myCharacter.x, myCharacter.y, myCharacter.z, 0},
-                {200.0f, 400.0f, 0.0f, 1},
-                {800.0f, 200.0f, 0.0f, 1}
-            };
+            std::vector<RenderEntity> entities;
+            entities.push_back({myCharacter.x, myCharacter.y, myCharacter.z, 0});
+
+            for (int y = 0; y < gameMap.size(); ++y) {
+                for (int x = 0; x < gameMap[y].size(); ++x) {
+                    if (gameMap[y][x] > 0) {
+                        float worldX = x * TILE_SIZE + TILE_SIZE / 2.0f;
+                        float worldY = y * TILE_SIZE + TILE_SIZE / 2.0f;
+                        entities.push_back({worldX, worldY, 0.0f, gameMap[y][x]});
+                    }
+                }
+            }
 
             // Sort by Y descending for 2.5D top-down perspective
             std::sort(entities.begin(), entities.end(), [](const RenderEntity& a, const RenderEntity& b) {
@@ -179,8 +211,8 @@ int main() {
                 } else if (ent.type == 1) {
                     // Draw Bush
                     bushTex.bind();
-                    myShader.setFloat("scaleX", 50.0f);
-                    myShader.setFloat("scaleY", 50.0f);
+                    myShader.setFloat("scaleX", TILE_SIZE);
+                    myShader.setFloat("scaleY", TILE_SIZE);
                     myShader.setVec2("texOffset", 0.0f, 0.0f);
                     myShader.setVec2("texScale", 1.0f, 1.0f);
                     myShader.setBool("useTexture", true);
@@ -191,6 +223,21 @@ int main() {
                     myShader.setFloat("offsetZ", ent.z);
                     myMesh.draw();
                     bushTex.unbind();
+                } else if (ent.type == 2) {
+                    // Draw Tree
+                    treeTex.bind();
+                    myShader.setFloat("scaleX", TILE_SIZE);
+                    myShader.setFloat("scaleY", TILE_SIZE);
+                    myShader.setVec2("texOffset", 0.0f, 0.0f);
+                    myShader.setVec2("texScale", 1.0f, 1.0f);
+                    myShader.setBool("useTexture", true);
+                    myShader.setInt("ourTexture", 0);
+
+                    myShader.setFloat("offsetX", ent.x);
+                    myShader.setFloat("offsetY", ent.y);
+                    myShader.setFloat("offsetZ", ent.z);
+                    myMesh.draw();
+                    treeTex.unbind();
                 }
             }
 

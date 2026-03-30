@@ -3,6 +3,7 @@
 
 #include "Windows.h"
 #include "Character.h"
+#include <vector>
 
 enum class GameState {
     Menu,
@@ -15,7 +16,7 @@ public:
     Logic();
     ~Logic();
 
-    void update(float deltaTime, Windows& window, Character& character);
+    void update(float deltaTime, Windows& window, Character& character, const std::vector<std::vector<int>>& gameMap, float tileSize);
     void renderUI(Windows& window);
 
     GameState getGameState() const { return currentState; }
@@ -34,7 +35,7 @@ private:
     char nameBuf[64];
     std::string playerName;
 
-    void updatePlayingState(float deltaTime, Windows& window, Character& character);
+    void updatePlayingState(float deltaTime, Windows& window, Character& character, const std::vector<std::vector<int>>& gameMap, float tileSize);
     void renderMainMenu(Windows& window);
     void renderOptionsMenu(Windows& window);
     void renderPlayingUI(Windows& window);
