@@ -7,6 +7,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
+find_package(imgui CONFIG REQUIRED)
+find_package(glm CONFIG REQUIRED)
 
 add_executable(program_main 
     src/main.cpp
@@ -18,4 +20,16 @@ add_executable(program_main
 target_link_libraries(program_main PRIVATE
     glfw
     glad::glad
+    imgui::imgui
+    glm::glm
 )
+
+enable_testing()
+
+add_executable(test_character test/test_character.cpp src/Character.cpp src/Model.cpp src/Shader.cpp)
+target_link_libraries(test_character PRIVATE
+    glfw
+    glad::glad
+    glm::glm
+)
+add_test(NAME CharacterTest COMMAND test_character)

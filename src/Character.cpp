@@ -1,7 +1,21 @@
 #include "Character.h"
 
-Character::Character(float startX, float startY, float w, float h, Model* charModel)
-    : x(startX), y(startY), width(w), height(h), model(charModel) {
+Character::Character(float startX, float startY, float startZ, float w, float h, Model* charModel)
+    : x(startX), y(startY), z(startZ), width(w), height(h), model(charModel), velocityZ(0.0f), isJumping(false) {
+}
+
+void Character::update(float deltaTime) {
+    if (isJumping) {
+        float gravity = -9.8f;
+        velocityZ += gravity * deltaTime;
+        z += velocityZ * deltaTime;
+
+        if (z <= 0.0f) {
+            z = 0.0f;
+            isJumping = false;
+            velocityZ = 0.0f;
+        }
+    }
 }
 
 void Character::draw(Shader& shader) {
@@ -14,6 +28,7 @@ void Character::draw(Shader& shader) {
         shader.use();
         shader.setFloat("offsetX", x);
         shader.setFloat("offsetY", y);
+        shader.setFloat("offsetZ", z);
         shader.setFloat("scaleX", width);
         shader.setFloat("scaleY", height);
 
