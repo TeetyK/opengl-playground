@@ -1,2 +1,0 @@
-CharacterTest 2 0.00231265
----
