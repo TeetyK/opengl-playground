@@ -9,11 +9,15 @@ find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
+find_path(STB_INCLUDE_DIRS "stb_image.h")
 
 add_executable(program_main 
     src/main.cpp
     src/Shader.cpp
-    src/Model.cpp
+    src/Windows.cpp
+    src/Mesh.cpp
+    src/Image.cpp
+    src/Logic.cpp
     src/Character.cpp
 )
 
@@ -23,10 +27,11 @@ target_link_libraries(program_main PRIVATE
     imgui::imgui
     glm::glm
 )
+target_include_directories(program_main PRIVATE ${STB_INCLUDE_DIRS})
 
 enable_testing()
 
-add_executable(test_character test/test_character.cpp src/Character.cpp src/Model.cpp src/Shader.cpp)
+add_executable(test_character test/test_character.cpp src/Character.cpp src/Mesh.cpp src/Shader.cpp)
 target_link_libraries(test_character PRIVATE
     glfw
     glad::glad

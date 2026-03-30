@@ -1,4 +1,5 @@
 #include "../src/Character.h"
+#include "../src/Mesh.h"
 #include <iostream>
 #include <cassert>
 
