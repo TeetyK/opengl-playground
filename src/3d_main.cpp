@@ -88,6 +88,15 @@ int main() {
 
     float lastFrameTime = 0.0f;
 
+    // Camera settings
+    glm::vec3 cameraPos = glm::vec3(0.0f, 25000.0f, 80000.0f);
+    glm::vec3 cameraTarget = glm::vec3(0.0f, 15000.0f, 0.0f);
+
+    // Character position and rotation
+    glm::vec3 modelPos(0.0f, 0.0f, 0.0f);
+    float moveSpeed = 40000.0f;
+    float rotationAngle = 0.0f; // Y-axis rotation
+
     while (!gameWindow.shouldClose()) {
         float currentFrameTime = glfwGetTime();
         float deltaTime = currentFrameTime - lastFrameTime;
@@ -95,28 +104,55 @@ int main() {
 
         gameWindow.pollEvents();
 
+        // Process Input
+        glm::vec3 moveDir(0.0f);
+        if (gameWindow.isKeyPressed(GLFW_KEY_W)) {
+            moveDir.z -= 1.0f;
+        }
+        if (gameWindow.isKeyPressed(GLFW_KEY_S)) {
+            moveDir.z += 1.0f;
+        }
+        if (gameWindow.isKeyPressed(GLFW_KEY_A)) {
+            moveDir.x -= 1.0f;
+        }
+        if (gameWindow.isKeyPressed(GLFW_KEY_D)) {
+            moveDir.x += 1.0f;
+        }
+
+        if (glm::length(moveDir) > 0.0f) {
+            moveDir = glm::normalize(moveDir);
+            modelPos += moveDir * moveSpeed * deltaTime;
+
+            // Calculate rotation to face movement direction
+            rotationAngle = glm::degrees(atan2(moveDir.x, moveDir.z));
+        }
+
+        // Make camera follow character
+        cameraPos = modelPos + glm::vec3(0.0f, 25000.0f, 80000.0f);
+        cameraTarget = modelPos + glm::vec3(0.0f, 15000.0f, 0.0f);
+
         glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shader3D.use();
 
         // View/Projection setup
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)gameWindow.getWidth() / (float)gameWindow.getHeight(), 0.1f, 100000.0f);
-
-        // Setup camera
-        float camX = sin(glfwGetTime() * 0.5f) * 15000.0f;
-        float camZ = cos(glfwGetTime() * 0.5f) * 15000.0f;
-        glm::mat4 view = glm::lookAt(glm::vec3(camX, 5000.0f, camZ), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)gameWindow.getWidth() / (float)gameWindow.getHeight(), 0.1f, 200000.0f);
+        glm::mat4 view = glm::lookAt(cameraPos, cameraTarget, glm::vec3(0.0f, 1.0f, 0.0f));
 
         shader3D.setMat4("projection", &projection[0][0]);
         shader3D.setMat4("view", &view[0][0]);
 
         // Model matrix
         glm::mat4 modelMatrix = glm::mat4(1.0f);
-        // Translate model to center (arbitrary, based on model coords)
-        modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, 0.0f, 0.0f));
-        // Optional scale if the model is too big/small
-        // modelMatrix = glm::scale(modelMatrix, glm::vec3(0.01f));
+        modelMatrix = glm::translate(modelMatrix, modelPos);
+
+        // Rotate character to face movement direction (around Y-axis)
+        modelMatrix = glm::rotate(modelMatrix, glm::radians(rotationAngle), glm::vec3(0.0f, 1.0f, 0.0f));
+
+        // Stand the character straight up (rotate -90 on X-axis)
+        modelMatrix = glm::rotate(modelMatrix, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+
         shader3D.setMat4("model", &modelMatrix[0][0]);
 
         // Draw model
