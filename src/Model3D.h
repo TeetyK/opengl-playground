@@ -34,7 +34,7 @@ public:
     // Copy construction and assignment are deleted to easily manage GL resources or implemented via rule of 5
     // For simplicity here, we'll allow moving or just assume they are stored in a vector without copy
 
-    void draw(Shader &shader) const;
+    void draw(Shader &shader, glm::vec3 overrideColor = glm::vec3(1.0f)) const;
     void setupMesh();
 
 private:
@@ -44,7 +44,7 @@ private:
 class Model3D {
 public:
     Model3D(const std::string& path, const std::string& baseDir);
-    void draw(Shader &shader) const;
+    void draw(Shader &shader, glm::vec3 overrideColor = glm::vec3(1.0f)) const;
 
 private:
     std::vector<Mesh3D> meshes;
