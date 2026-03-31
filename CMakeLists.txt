@@ -9,6 +9,7 @@ find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(glm CONFIG REQUIRED)
+find_package(tinyobjloader CONFIG REQUIRED)
 find_path(STB_INCLUDE_DIRS "stb_image.h")
 # find_path(STB_INCLUDE_DIR stb_image.h)
 
@@ -29,6 +30,23 @@ target_link_libraries(program_main PRIVATE
     glm::glm
 )
 target_include_directories(program_main PRIVATE ${STB_INCLUDE_DIRS})
+
+add_executable(3d_main
+    src/3d_main.cpp
+    src/Shader.cpp
+    src/Windows.cpp
+    src/Image.cpp
+    src/Model3D.cpp
+)
+
+target_link_libraries(3d_main PRIVATE
+    glfw
+    glad::glad
+    imgui::imgui
+    glm::glm
+    tinyobjloader::tinyobjloader
+)
+target_include_directories(3d_main PRIVATE ${STB_INCLUDE_DIRS})
 
 enable_testing()
 
