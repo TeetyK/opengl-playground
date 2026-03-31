@@ -2,6 +2,9 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 #include "Windows.h"
 #include "Shader.h"
 #include "Model3D.h"
@@ -88,6 +91,14 @@ int main() {
 
     float lastFrameTime = 0.0f;
 
+    // Setup ImGui
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(gameWindow.getWindow(), true);
+    ImGui_ImplOpenGL3_Init("#version 330");
+
     // Camera settings
     glm::vec3 cameraPos = glm::vec3(0.0f, 25000.0f, 80000.0f);
     glm::vec3 cameraTarget = glm::vec3(0.0f, 15000.0f, 0.0f);
@@ -96,6 +107,8 @@ int main() {
     glm::vec3 modelPos(0.0f, 0.0f, 0.0f);
     float moveSpeed = 40000.0f;
     float rotationAngle = 0.0f; // Y-axis rotation
+
+    glm::vec3 modelColor(1.0f, 1.0f, 1.0f); // Default color modifier
 
     while (!gameWindow.shouldClose()) {
         float currentFrameTime = glfwGetTime();
@@ -134,6 +147,14 @@ int main() {
         glClearColor(0.1f, 0.1f, 0.15f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::Begin("Color Modifier");
+        ImGui::ColorEdit3("Model Color", &modelColor[0]);
+        ImGui::End();
+
         shader3D.use();
 
         // View/Projection setup
@@ -156,10 +177,17 @@ int main() {
         shader3D.setMat4("model", &modelMatrix[0][0]);
 
         // Draw model
-        myModel.draw(shader3D);
+        myModel.draw(shader3D, modelColor);
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         gameWindow.swapBuffers();
     }
+
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
     return 0;
 }

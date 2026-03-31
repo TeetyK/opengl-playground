@@ -40,12 +40,12 @@ void Mesh3D::setupMesh() {
     glBindVertexArray(0);
 }
 
-void Mesh3D::draw(Shader &shader) const {
+void Mesh3D::draw(Shader &shader, glm::vec3 overrideColor) const {
     unsigned int diffuseNr = 1;
     unsigned int specularNr = 1;
 
     shader.setBool("useTexture", textures.size() > 0);
-    shader.setVec3("colorModifier", diffuseColor);
+    shader.setVec3("colorModifier", diffuseColor * overrideColor);
 
     for(unsigned int i = 0; i < textures.size(); i++) {
         glActiveTexture(GL_TEXTURE0 + i);
@@ -71,9 +71,9 @@ Model3D::Model3D(const std::string& path, const std::string& baseDir) {
     loadModel(path, baseDir);
 }
 
-void Model3D::draw(Shader &shader) const {
+void Model3D::draw(Shader &shader, glm::vec3 overrideColor) const {
     for(unsigned int i = 0; i < meshes.size(); i++) {
-        meshes[i].draw(shader);
+        meshes[i].draw(shader, overrideColor);
     }
 }
 
