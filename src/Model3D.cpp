@@ -99,20 +99,19 @@ void Model3D::loadModel(const std::string& path, const std::string& baseDir) {
     auto& materials = reader.GetMaterials();
 
     for (size_t s = 0; s < shapes.size(); s++) {
-        std::vector<Vertex> vertices;
-        std::vector<unsigned int> indices;
-        std::vector<Texture> textures;
-        glm::vec3 diffuseColor(1.0f);
+        // We will create a separate Mesh3D for each material in this shape.
+        // A shape might have faces with different materials.
+        std::map<int, std::vector<Vertex>> mat_vertices;
+        std::map<int, std::vector<unsigned int>> mat_indices;
 
         // tinyobjloader uses separate indices for v, vn, vt.
         // We need to flatten them for OpenGL. To do this efficiently, we typically use a map,
-        // but for simplicity, we can just push every vertex and give it a new index.
+        // but for simplicity, we can just push every vertex and give it a new index per material.
         size_t index_offset = 0;
-        int current_material_id = -1;
 
         for (size_t f = 0; f < shapes[s].mesh.num_face_vertices.size(); f++) {
             size_t fv = size_t(shapes[s].mesh.num_face_vertices[f]);
-            current_material_id = shapes[s].mesh.material_ids[f];
+            int current_material_id = shapes[s].mesh.material_ids[f];
 
             for (size_t v = 0; v < fv; v++) {
                 tinyobj::index_t idx = shapes[s].mesh.indices[index_offset + v];
@@ -143,30 +142,37 @@ void Model3D::loadModel(const std::string& path, const std::string& baseDir) {
                     vertex.TexCoords = {0.0f, 0.0f};
                 }
 
-                vertices.push_back(vertex);
-                indices.push_back(vertices.size() - 1);
+                mat_vertices[current_material_id].push_back(vertex);
+                mat_indices[current_material_id].push_back(mat_vertices[current_material_id].size() - 1);
             }
             index_offset += fv;
         }
 
-        if (current_material_id >= 0 && current_material_id < materials.size()) {
-            const auto& mat = materials[current_material_id];
-            diffuseColor = glm::vec3(mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]);
+        // Now create a mesh for each material found in this shape
+        for (const auto& pair : mat_vertices) {
+            int mat_id = pair.first;
+            std::vector<Texture> textures;
+            glm::vec3 diffuseColor(1.0f);
 
-            if (!mat.diffuse_texname.empty()) {
-                std::string texPath = directory + "/" + mat.diffuse_texname;
-                auto img = loadTexture(texPath);
-                if (img) {
-                    Texture texture;
-                    texture.image = img;
-                    texture.type = "texture_diffuse";
-                    texture.path = mat.diffuse_texname;
-                    textures.push_back(texture);
+            if (mat_id >= 0 && mat_id < materials.size()) {
+                const auto& mat = materials[mat_id];
+                diffuseColor = glm::vec3(mat.diffuse[0], mat.diffuse[1], mat.diffuse[2]);
+
+                if (!mat.diffuse_texname.empty()) {
+                    std::string texPath = directory + "/" + mat.diffuse_texname;
+                    auto img = loadTexture(texPath);
+                    if (img) {
+                        Texture texture;
+                        texture.image = img;
+                        texture.type = "texture_diffuse";
+                        texture.path = mat.diffuse_texname;
+                        textures.push_back(texture);
+                    }
                 }
             }
-        }
 
-        meshes.push_back(Mesh3D(vertices, indices, textures, diffuseColor));
+            meshes.push_back(Mesh3D(mat_vertices[mat_id], mat_indices[mat_id], textures, diffuseColor));
+        }
     }
 }
 
