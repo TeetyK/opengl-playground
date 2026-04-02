@@ -19,15 +19,10 @@ Image::Image(const std::string& filepath) : textureID(0), width(0), height(0), c
 
     // Load image
     stbi_set_flip_vertically_on_load(true);
-    unsigned char* data = stbi_load(filepath.c_str(), &width, &height, &channels, 0);
+    // Force loading with 4 channels (RGBA) so textures correctly provide alpha channel for the shader discard check.
+    unsigned char* data = stbi_load(filepath.c_str(), &width, &height, &channels, STBI_rgb_alpha);
     if (data) {
-        GLenum format = GL_RGB;
-        if (channels == 1)
-            format = GL_RED;
-        else if (channels == 3)
-            format = GL_RGB;
-        else if (channels == 4)
-            format = GL_RGBA;
+        GLenum format = GL_RGBA;
 
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
