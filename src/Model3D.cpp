@@ -136,7 +136,7 @@ void Model3D::loadModel(const std::string& path, const std::string& baseDir) {
                 if (idx.texcoord_index >= 0) {
                     vertex.TexCoords = {
                         attrib.texcoords[2 * size_t(idx.texcoord_index) + 0],
-                        1.0f - attrib.texcoords[2 * size_t(idx.texcoord_index) + 1] // flip y
+                        attrib.texcoords[2 * size_t(idx.texcoord_index) + 1]
                     };
                 } else {
                     vertex.TexCoords = {0.0f, 0.0f};

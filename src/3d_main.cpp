@@ -61,12 +61,12 @@ void main()
     }
 
     // Basic directional lighting
-    vec3 norm = normalize(Normal);
+    vec3 norm = length(Normal) > 0.0 ? normalize(Normal) : vec3(0.0, 1.0, 0.0);
     vec3 lightDir = normalize(vec3(0.5, 1.0, 0.3));
     float diff = max(dot(norm, lightDir), 0.0);
     vec3 diffuse = diff * vec3(1.0); // white light
 
-    vec3 ambient = 0.2 * vec3(1.0);
+    vec3 ambient = 0.6 * vec3(1.0);
 
     vec3 finalColor = (ambient + diffuse) * resultColor;
     FragColor = vec4(finalColor, 1.0);
