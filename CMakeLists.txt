@@ -36,7 +36,6 @@ add_executable(3d_main
     src/Shader.cpp
     src/Windows.cpp
     src/Image.cpp
-    src/Model3D.cpp
 )
 
 target_link_libraries(3d_main PRIVATE
@@ -44,7 +43,6 @@ target_link_libraries(3d_main PRIVATE
     glad::glad
     imgui::imgui
     glm::glm
-    tinyobjloader::tinyobjloader
 )
 target_include_directories(3d_main PRIVATE ${STB_INCLUDE_DIRS})
 
